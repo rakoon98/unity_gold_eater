@@ -6,4 +6,5 @@
 *.zip filter=lfs diff=lfs merge=lfs -text
 *.psd filter=lfs diff=lfs merge=lfs -text
 *.fbx filter=lfs diff=lfs merge=lfs -text
+Assets/_Project/Fonts/*[[:space:]]SDF.asset filter=lfs diff=lfs merge=lfs -text
 Assets/_Project/Fonts/*.asset filter=lfs diff=lfs merge=lfs -text
