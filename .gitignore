@@ -1,0 +1,36 @@
+# Unity generated
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# Custom Builds & Recordings
+BuildTest/
+TestBuild/
+Recordings/
+
+# IDE & Editor
+.vs/
+.idea/
+.gradle/
+.vscode/
+.plastic/
+
+# Visual Studio / Solution generated
+*.csproj
+*.sln
+*.slnx
+*.suo
+*.user
+*.userprefs
+
+# OS & Configs
+.DS_Store
+Thumbs.db
+ignore.conf
+
+# Crash / debug
+sysinfo.txt

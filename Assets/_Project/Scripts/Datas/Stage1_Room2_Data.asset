@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ada314994bb7abd4d95ed2984ec9747c, type: 3}
+  m_Name: Stage1_Room2_Data
+  m_EditorClassIdentifier: Assembly-CSharp::GoldEater.EnemyPoolData
+  enemyPrefabs:
+  - {fileID: 3086799698118249237, guid: 393039dd26eaef54fbaaa6a67a4d5d8b, type: 3}
+  - {fileID: 3086799698118249237, guid: 22b42349e589e8a4ba0403e366409ba6, type: 3}
