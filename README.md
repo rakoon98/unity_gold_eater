@@ -22,17 +22,16 @@ Unity6 2D 플랫폼 액션 포트폴리오
 
 ## 폴더 구조
 
-Assets/
-└─ _Project/
-   ├─ Scripts/
-   │  ├─ Character/  # Player, Enemy, Boss (FSM, Pattern)
-   │  ├─ Core/       # Damage, Gold, Stat
-   │  ├─ Managers/   # Persistent, UI, Stage, Camera
-   │  └─ UIs/
-   ├─ SO/            # ScriptableObject 데이터
-   ├─ Scenes/
-   ├─ Animation/
-   ├─ Resources/
-   ├─ Systems/
-   ├─ Fonts/
-   └─ Downloads/
+- `Assets/_Project/`
+  - `Scripts/`
+    - `Character/` — Player, Enemy, Boss (FSM, Pattern)
+    - `Core/` — Damage, Gold, Stat
+    - `Managers/` — Persistent, UI, Stage, Camera
+    - `UIs/`
+  - `SO/` — ScriptableObject 데이터
+  - `Scenes/`
+  - `Animation/`
+  - `Resources/`
+  - `Systems/`
+  - `Fonts/`
+  - `Downloads/`
