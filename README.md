@@ -173,4 +173,4 @@ Assets/_Project/
 **김정현 (kun93686)**
 
 - Email: kun93686@gmail.com
-- GitHub: (링크 추가 예정)
+- GitHub: [rakoon98/unity_gold_eater](https://github.com/rakoon98/unity_gold_eater/tree/master)
