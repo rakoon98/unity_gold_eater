@@ -88,7 +88,8 @@ namespace GoldEater
 
             bossHealth = null;
 
-            fillImage.fillAmount = 0;
+            if (fillImage != null)
+                fillImage.fillAmount = 0;
 
             Close();
         }

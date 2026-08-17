@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GoldEater.CharacterStatSO
   stats:
   - statType: 0
-    baseValue: 100
+    baseValue: 50
   - statType: 1
     baseValue: 0.5
   - statType: 2

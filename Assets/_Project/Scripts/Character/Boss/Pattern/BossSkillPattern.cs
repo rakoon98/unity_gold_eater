@@ -1,3 +1,4 @@
+using System.Threading;
 using Cysharp.Threading.Tasks;
 
 namespace GoldEater
@@ -9,10 +10,9 @@ namespace GoldEater
         public float Weight => 15f;
         public bool CanExecute(BossContext ctx) => true;
 
-        public async UniTask Execute(BossContext ctx)
+
+        public async UniTask Execute(BossContext ctx, CancellationToken token)
         {
-            // 예고(윈드업) 구간 = 패링 가능 창
-            //ctx.Animator.Play(ClipName);
             ctx.Animator.PlaySkill1();
 
             await UniTask.Delay(System.TimeSpan.FromSeconds(1.0f));

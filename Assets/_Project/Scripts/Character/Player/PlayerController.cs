@@ -175,7 +175,7 @@ namespace GoldEater
 
         private void HandleAbsorb()
         {
-            if(input.absorbPressed)
+            if(input.absorbPressed || input.absorbHeld)
                 absorber.TryAbsorb();
         }
 

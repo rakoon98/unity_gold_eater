@@ -1,3 +1,4 @@
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using GoldEater;
 using UnityEngine;
@@ -7,7 +8,7 @@ public interface IBossPattern
     string PatternName { get; }
     float Weight { get; }
     bool CanExecute(BossContext ctx);
-    UniTask Execute(BossContext ctx); // 콜백 대신 awaitable로 변경
+    UniTask Execute(BossContext ctx, CancellationToken token);
 }
 
 // 패턴들이 공통으로 참조할 컨텍스트 (필요한 참조만 모아둠)

@@ -5,6 +5,7 @@ namespace GoldEater
 {
     public class GoldAbsorber : MonoBehaviour
     {
+
         [System.Serializable]
         public struct FloatRange
         {
@@ -23,6 +24,10 @@ namespace GoldEater
         private GoldInventory inventory;
         private StatComponent playerStat;
         private int goldCostPerAbsorb = 1;
+
+
+        private float absorbInterval = 0.1f;
+        private float absorbTimer;
 
         private static readonly StatType[] candidates =
         {
@@ -47,11 +52,20 @@ namespace GoldEater
             if (playerStat == null) playerStat = GetComponent<StatComponent>();
         }
 
+        private void Update()
+        {
+            if (absorbTimer > 0f)
+                absorbTimer -= Time.deltaTime;
+        }
+
         public bool TryAbsorb()
         {
+
+            if (absorbTimer > 0f)
+                return false;
+
             if (!inventory.TryConsumeGold(goldCostPerAbsorb))
             {
-                Debug.Log("°ñµå°¡ ºÎÁ·ÇÕ´Ï´Ù.");
                 return false;
             }
 
@@ -62,9 +76,11 @@ namespace GoldEater
             playerStat.AddModifier(modifier);
 
             string result = $"{picked} +{value:F2} »ó½Â!";
-            Debug.Log($"[Absorb] {result} (³²Àº °ñµå: {inventory.GoldCount})");
+            //Debug.Log($"[Absorb] {result} (³²Àº °ñµå: {inventory.GoldCount})");
 
             NotificationManager.instance.ShowNotification($"<color=#FFD700>{result}</color>");
+            absorbTimer = absorbInterval;
+
             return true;
         }
 

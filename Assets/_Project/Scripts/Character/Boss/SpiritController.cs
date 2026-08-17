@@ -3,41 +3,63 @@ using Cysharp.Threading.Tasks;
 
 namespace GoldEater
 {
-
+    [RequireComponent(typeof(StatComponent))]
     public class SpiritController : MonoBehaviour
     {
-        [SerializeField] private float moveSpeed = 2f;
-        [SerializeField] private float contactDamage = 1f;
-        [SerializeField] private float lifeTime = 6f; // 이 시간 지나도 안 닿으면 자동 소멸
-        [SerializeField] private float bobAmplitude = 0.1f; // 부유감
+        [Header("Settings")]
+        [SerializeField] private float lifeTime = 6f;
+        [SerializeField] private float bobAmplitude = 0.1f;
         [SerializeField] private float bobFrequency = 2f;
 
+        [SerializeField] private SpiritAnimator animator;
 
-        [SerializeField] private SpiritAnimator animator; // Animator 직접 대신 SpiritAnimator
+        // StatComponent에서 1회만 캐싱하여 사용할 스탯 값
+        private float moveSpeed;
+        private float contactDamage;
+
         private Rigidbody2D rb;
+        private Collider2D[] allColliders;
         private Transform player;
         private bool isDying;
-        private float baseY;
 
-        EnemyHealth health;
+        private EnemyHealth health;
+        private StatComponent statComponent;
 
         private void Awake()
         {
             animator = GetComponentInChildren<SpiritAnimator>();
             rb = GetComponent<Rigidbody2D>();
-            rb.bodyType = RigidbodyType2D.Kinematic; // 물리 힘 안 받고 스크립트로만 이동
+            allColliders = GetComponentsInChildren<Collider2D>();
+            rb.bodyType = RigidbodyType2D.Kinematic;
 
             health = GetComponent<EnemyHealth>();
-            health.OnDead += () => SelfDestructAsync().Forget();
+            statComponent = GetComponent<StatComponent>();
+
+            if (health != null)
+            {
+                health.OnDead += () => SelfDestructAsync().Forget();
+            }
         }
 
         private async void Start()
         {
-            animator.PlaySummon(); // animator.Play("summon") 대신
+            // StatComponent.Awake() 이후 시점인 Start에서 1회만 캐싱
+            CacheStats();
+
+            animator.PlaySummon();
             await UniTask.Delay(System.TimeSpan.FromSeconds(0.5f));
             await FindPlayerAsync();
             animator.PlayIdle();
             LifeTimeoutAsync().Forget();
+        }
+
+        private void CacheStats()
+        {
+            if (statComponent != null)
+            {
+                moveSpeed = statComponent.GetStat(StatType.MoveSpeed);
+                contactDamage = statComponent.GetStat(StatType.Attack);
+            }
         }
 
         private async UniTask FindPlayerAsync()
@@ -54,23 +76,14 @@ namespace GoldEater
         {
             if (isDying || player == null) return;
 
-            // 플레이어 방향으로 서서히 이동
+            // 미리 캐싱된 moveSpeed 사용
             Vector2 dir = ((Vector2)player.position - (Vector2)transform.position).normalized;
             Vector2 nextPos = (Vector2)transform.position + dir * moveSpeed * Time.deltaTime;
 
-            // 위아래 부유감 추가
             float bob = Mathf.Sin(Time.time * bobFrequency) * bobAmplitude;
             nextPos.y += bob * Time.deltaTime;
 
             rb.MovePosition(nextPos);
-
-            //// 좌우 반전 (스프라이트가 방향 있는 경우)
-            //if (dir.x != 0)
-            //{
-            //    Vector3 scale = transform.localScale;
-            //    scale.x = Mathf.Abs(scale.x) * (dir.x < 0 ? -1 : 1);
-            //    transform.localScale = scale;
-            //}
 
             if (Mathf.Abs(dir.x) > 0.01f)
                 animator.SetFacing(dir.x);
@@ -78,22 +91,21 @@ namespace GoldEater
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            //if (isDying) return;
+            if (isDying) return;
 
-            //if (other.TryGetComponent<IDamageable>(out var damageable) && !damageable.isDead)
-            //{
-            //    damageable.TakeDamage(contactDamage);
-            //    SelfDestructAsync().Forget();
-            //}
-
-            var damageable = other.GetComponentInParent<IDamageable>();
-
-            if (damageable != null && !damageable.isDead)
+            if (other.CompareTag("Player"))
             {
-                //float damage = bossStat.GetStat(StatType.Attack);
-                //damageable.TakeDamage(damage);
-                damageable.TakeDamage(contactDamage);
-                SelfDestructAsync().Forget();
+                var damageable = other.GetComponentInParent<IDamageable>();
+
+                if (damageable != null && !damageable.isDead)
+                {
+                    DisableAllColliders();
+
+                    // 미리 캐싱된 contactDamage 적용
+                    damageable.TakeDamage(contactDamage);
+
+                    SelfDestructAsync().Forget();
+                }
             }
         }
 
@@ -109,12 +121,21 @@ namespace GoldEater
             if (isDying) return;
             isDying = true;
 
+            DisableAllColliders();
+
             animator.PlayDeath();
-            await UniTask.Delay(System.TimeSpan.FromSeconds(0.5f)); // death 클립 길이에 맞게 조정
+            await UniTask.Delay(System.TimeSpan.FromSeconds(0.5f));
 
             Destroy(gameObject);
         }
 
-        // 보스 공격(플레이어 무기)에 맞아 죽는 경우도 처리하고 싶다면 IDamageable 구현 추가 가능
+        private void DisableAllColliders()
+        {
+            if (allColliders == null) return;
+            foreach (var col in allColliders)
+            {
+                if (col != null) col.enabled = false;
+            }
+        }
     }
 }

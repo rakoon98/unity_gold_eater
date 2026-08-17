@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using System;
+using System.Threading;
 
 namespace GoldEater
 {
@@ -20,33 +22,41 @@ namespace GoldEater
 
         private async UniTaskVoid ChooseAndExecuteAsync()
         {
+            
             var token = controller.GetCancellationTokenOnDestroy();
 
             if (token.IsCancellationRequested)
                 return;
 
-            var ctx = controller.BuildContext();
-
-            var candidates = patterns.FindAll(p => p.CanExecute(ctx));
-
-            if (candidates.Count == 0)
+            try 
             {
-                if (!token.IsCancellationRequested)
-                    controller.StateMachine.ChangeState(controller.IdleState);
+                var ctx = controller.BuildContext();
 
-                return;
+                var candidates = patterns.FindAll(p => p.CanExecute(ctx));
+
+                if (candidates.Count == 0)
+                {
+                    if (!token.IsCancellationRequested)
+                        controller.StateMachine.ChangeState(controller.IdleState);
+
+                    return;
+                }
+
+                var chosen = ChooseByWeight(candidates);
+
+                
+                await chosen.Execute(ctx, token);
+
+                if (token.IsCancellationRequested)
+                    return;
+
+                controller.StateMachine.ChangeState(controller.IdleState);
             }
-
-            var chosen = ChooseByWeight(candidates);
-
-            Debug.Log($"[Boss] 패턴 선택 : {chosen.PatternName}");
-
-            await chosen.Execute(ctx);
-
-            if (token.IsCancellationRequested)
-                return;
-
-            controller.StateMachine.ChangeState(controller.IdleState);
+           
+            catch (OperationCanceledException)
+            {
+                // Boss Destroy로 인한 정상적인 취소
+            }
         }
 
         private IBossPattern ChooseByWeight(List<IBossPattern> candidates)
@@ -54,7 +64,7 @@ namespace GoldEater
             float totalWeight = 0f;
             foreach (var p in candidates) totalWeight += p.Weight;
 
-            float rand = Random.Range(0f, totalWeight);
+            float rand = UnityEngine.Random.Range(0f, totalWeight);
             float cumulative = 0f;
 
             foreach (var p in candidates)

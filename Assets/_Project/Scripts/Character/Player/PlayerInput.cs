@@ -12,6 +12,7 @@ public class PlayerInput : MonoBehaviour
     public bool attackPressed { get; private set; }
     public bool attackHeld { get; private set; }
     public bool absorbPressed { get; private set; }
+    public bool absorbHeld { get; private set; }
     public bool statInfoPressed { get; private set; }
 
     [Header("입력 버퍼링 — 상세기획서 '조작 & 프레임 데이터' 기준")]
@@ -108,6 +109,7 @@ public class PlayerInput : MonoBehaviour
         interactPressed = interactAction.WasPressedThisFrame();
         attackPressed = attackAction.WasPressedThisFrame();
         attackHeld = attackAction.IsPressed();
+        absorbHeld = absorbAction.IsPressed();
         absorbPressed = absorbAction.WasPressedThisFrame();
         statInfoPressed = statInfoAction.WasPressedThisFrame();
 

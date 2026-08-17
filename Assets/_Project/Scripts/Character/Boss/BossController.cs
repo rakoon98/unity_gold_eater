@@ -1,6 +1,8 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.Threading;
 
 namespace GoldEater
 {
@@ -69,13 +71,33 @@ namespace GoldEater
 
         private async UniTaskVoid FindAndStart()
         {
-            await FindPlayerAsync();
-            StateMachine.ChangeState(IdleState);
+            // ★ 추가
+            var token = this.GetCancellationTokenOnDestroy();
+
+            try
+            {
+                // ★ 변경
+                await FindPlayerAsync(token);
+
+                // ★ 추가
+                if (token.IsCancellationRequested)
+                    return;
+
+                StateMachine.ChangeState(IdleState);
+            }
+            // ★ 추가
+            catch (OperationCanceledException)
+            {
+                // Boss가 Destroy되면서 정상적으로 취소됨
+            }
         }
 
         private void UpdateFacing()
         {
             if (player == null) return;
+
+            if (StateMachine.CurrentState == ChoosePatternState) return;
+
             float dir = player.position.x - transform.position.x;
             if (Mathf.Abs(dir) < 0.01f) return;
             Animator.SetFacing(dir); // 직접 transform 안 건드리고 BossAnimator에 위임
@@ -100,20 +122,21 @@ namespace GoldEater
             };
         }
 
-        private async UniTask FindPlayerAsync()
+        private async UniTask FindPlayerAsync(CancellationToken token)
         {
-            // 플레이어가 늦게 생성될 수 있으니 찾을 때까지 대기
-            // 다시 하기 했을때 문제 가 생길수있다는데 흠.... 
-            while (player == null)
+            while (!token.IsCancellationRequested)
             {
                 var found = GameObject.FindGameObjectWithTag("Player");
+
                 if (found != null)
                 {
                     player = found.transform;
-                    Debug.Log("[Boss] 플레이어 참조 할당 완료");
-                    break;
+                    return;
                 }
-                await UniTask.Delay(System.TimeSpan.FromSeconds(0.2f));
+
+                await UniTask.Delay(
+                    TimeSpan.FromSeconds(0.2f),
+                    cancellationToken: token);
             }
         }
     }

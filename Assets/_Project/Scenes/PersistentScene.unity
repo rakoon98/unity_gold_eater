@@ -3241,7 +3241,7 @@ MonoBehaviour:
   hudPanel: {fileID: 919452275}
   dashPanel: {fileID: 94080789}
   bossHealthPanel: {fileID: 713377756}
-  stageClearUI: {fileID: 0}
+  stageClearUI: {fileID: 1536900380}
 --- !u!114 &1421907382
 MonoBehaviour:
   m_ObjectHideFlags: 0
